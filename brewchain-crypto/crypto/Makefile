@@ -15,7 +15,7 @@ LIBCRYPTO    = libbrewchain-crypto.so
 all:$(LIBSECP256K1) $(LIBCRYPTO)
 
 $(LIBSECP256K1):
-	cd secp256k1; ./autogen.sh; ./configure --enable-module-recovery --with-bignum=no; make; cp .libs/libsecp256k1.a ..; cd ..
+	cd secp256k1; ./autogen.sh; ./configure --enable-module-recovery --with-bignum=no; make libsecp256k1.la; cp .libs/libsecp256k1.a ..; cd ..
 
 $(LIBCRYPTO):$(OBJECTS)
 	$(CC) -o $(LIBCRYPTO) $^ $(LDFLAGS) -Wl,--whole-archive -L. -l:libsecp256k1.a -I secp256k1 -Wl,--no-whole-archive -Xlinker --unresolved-symbols=ignore-in-shared-libs
