@@ -1,0 +1,6 @@
+sig.v: recID + 27
+sig.r: sig[0:32)
+sig.s: sig[32:64)
+
+
+sendData = RLP(msgdata + signature)
