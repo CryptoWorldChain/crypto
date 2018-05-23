@@ -29,19 +29,21 @@ JNIEXPORT void JNICALL Java_crypto_BitcoinCrypto_destroyEcc(
 JNIEXPORT jobjectArray JNICALL Java_crypto_BitcoinCrypto_createAccount(
         JNIEnv *env, jobject this)
 {
-    char p2pkh_addr[100];
     char privkey_hex[65];
-    char pubkey_hex[66];
-    size_t size = 66;
-    btc_key btckey;
+    char pubkey_hex[67];
+    char p2pkh_addr[100];
+    size_t pubkey_hexsize = 67;
+
+    btc_key    btckey;
     btc_pubkey pubkey;
+
+    jclass  clsString;
     jstring strPrikey;
     jstring strPubkey;
     jstring strAddress;
-    jclass  strClass;
     jobjectArray objArray;
 
-    //generate private key
+    //generate private key, 32 bytes
     btc_privkey_init(&btckey);
     btc_privkey_gen(&btckey);
 
@@ -51,7 +53,7 @@ JNIEXPORT jobjectArray JNICALL Java_crypto_BitcoinCrypto_createAccount(
 
     utils_bin_to_hex(btckey.privkey, BTC_ECKEY_PKEY_LENGTH, privkey_hex);
 
-    //generate public key
+    //generate public key, 33 bytes
     btc_pubkey_init(&pubkey);
     btc_pubkey_from_key(&btckey, &pubkey);
 
@@ -59,14 +61,16 @@ JNIEXPORT jobjectArray JNICALL Java_crypto_BitcoinCrypto_createAccount(
         return NULL;
     }
 
-    btc_pubkey_get_hex(&pubkey, pubkey_hex, &size);
+    btc_pubkey_get_hex(&pubkey, pubkey_hex, &pubkey_hexsize);
+
+    //generate p2pkh address
     btc_pubkey_getaddr_p2pkh(&pubkey, &btc_chainparams_main, p2pkh_addr);
 
     strPrikey = (*env)->NewStringUTF(env, (char *)privkey_hex);
     strPubkey = (*env)->NewStringUTF(env, (char *)pubkey_hex);
     strAddress = (*env)->NewStringUTF(env, (char *)p2pkh_addr);
-    strClass = (*env)->FindClass(env, "Ljava/lang/String;");
-    objArray = (*env)->NewObjectArray(env, 3, strClass, NULL);
+    clsString = (*env)->FindClass(env, "Ljava/lang/String;");
+    objArray = (*env)->NewObjectArray(env, 3, clsString, NULL);
     (*env)->SetObjectArrayElement(env, objArray, 0, strPrikey);
     (*env)->SetObjectArrayElement(env, objArray, 1, strPubkey);
     (*env)->SetObjectArrayElement(env, objArray, 2, strAddress);
@@ -79,36 +83,38 @@ JNIEXPORT jobjectArray JNICALL Java_crypto_BitcoinCrypto_recoverAccount(
         JNIEnv *env, jobject this, jlong context_, jstring prikey_)
 {
     const char *prikey;
-    char p2pkh_addr[100];
     char pubkey_hex[100];
-    size_t pubkey_len = 100;
+    char p2pkh_addr[100];
     size_t outlen = 0;
+
+    btc_key    btckey;
     btc_pubkey pubkey;
+
+    jclass  clsString;
     jstring strPubkey;
     jstring strAddress;
-    jclass  strClass;
     jobjectArray objArray;
 
     //generate public key
     prikey = (*env)->GetStringUTFChars(env, prikey_, JNI_FALSE);
-    pubkey_from_privatekey(&btc_chainparams_main, prikey, pubkey_hex, &pubkey_len);
+    btc_privkey_init(&btckey);
+    utils_hex_to_bin(prikey, btckey.privkey, strlen(prikey), (int *)&outlen);
     (*env)->ReleaseStringUTFChars(env, prikey_, prikey);
 
     btc_pubkey_init(&pubkey);
-    pubkey.compressed = 1;
-    utils_hex_to_bin(pubkey_hex, pubkey.pubkey, strlen(pubkey_hex), (int*)&outlen);
+    btc_pubkey_from_key(&btckey, &pubkey);
 
-    if (outlen != BTC_ECKEY_COMPRESSED_LENGTH
-            || !btc_pubkey_is_valid(&pubkey)) {
+    if (!btc_pubkey_is_valid(&pubkey)) {
         return NULL;
     }
 
+    //generate p2pkh address
     btc_pubkey_getaddr_p2pkh(&pubkey, &btc_chainparams_main, p2pkh_addr);
 
     strPubkey = (*env)->NewStringUTF(env, (char *)pubkey_hex);
     strAddress = (*env)->NewStringUTF(env, (char *)p2pkh_addr);
-    strClass = (*env)->FindClass(env, "Ljava/lang/String;");
-    objArray = (*env)->NewObjectArray(env, 3, strClass, NULL);
+    clsString = (*env)->FindClass(env, "Ljava/lang/String;");
+    objArray = (*env)->NewObjectArray(env, 3, clsString, NULL);
     (*env)->SetObjectArrayElement(env, objArray, 0, strPubkey);
     (*env)->SetObjectArrayElement(env, objArray, 1, strAddress);
 
@@ -120,7 +126,7 @@ JNIEXPORT jstring JNICALL Java_crypto_BitcoinCrypto_signTransaction(
         JNIEnv *env, jobject this, jstring prikey_, jstring txhex_,
         jstring scripthex_, jint inputindex_, jint sighashtype_, jlong amount_)
 {
-    btc_key key;
+    btc_key btckey;
     btc_tx *tx;
     cstring *script;
     uint256 sighash;
@@ -183,12 +189,11 @@ JNIEXPORT jstring JNICALL Java_crypto_BitcoinCrypto_signTransaction(
     hex = utils_uint8_to_hex(sighash, 32);
     utils_reverse_hex(hex, 64);
 
-    btc_privkey_init(&key);
-    btc_privkey_decode_wif(prikey, &btc_chainparams_main, &key);
+    btc_privkey_init(&btckey);
+    utils_hex_to_bin(prikey, btckey.privkey, strlen(prikey), (int *)&outlen);
 
-    res = btc_tx_sign_input(tx, script, amount, &key,
-            inputindex, sighashtype, sigcompact,
-            sigder_plus_hashtype, &sigderlen);
+    res = btc_tx_sign_input(tx, script, amount, &btckey, inputindex,
+            sighashtype, sigcompact, sigder_plus_hashtype, &sigderlen);
 
     cstr_free(script, true);
 
