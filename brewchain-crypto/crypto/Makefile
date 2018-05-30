@@ -5,7 +5,12 @@ SUBDIRS      = sha256 rlp jni
 SOURCES      = $(wildcard *.c sha256/*.c rlp/*.c jni/*.c)
 RMVDIRS      = $(notdir $(SOURCES))
 OBJECTS      = $(patsubst %.c,%.o,$(RMVDIRS))
-JNIHDRS      = -I /usr/lib/jvm/java-7-openjdk-amd64/include -I /usr/lib/jvm/java-7-openjdk-amd64/include/linux
+
+##Linux
+JNIHDRS      = -I /opt/jdk/include -I /opt/jdk/include/linux
+## MacOS
+#JNIHDRS      = -I /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/include -I /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/include/darwin
+
 LIBSECP256K1 = libsecp256k1.a
 LIBCRYPTO    = libbrewchain-crypto.so
 

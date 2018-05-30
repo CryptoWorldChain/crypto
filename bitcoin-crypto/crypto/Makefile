@@ -5,7 +5,8 @@ SUBDIRS      = btc jni include/btc
 SOURCES      = $(wildcard btc/*.c jni/*.c)
 RMVDIRS      = $(notdir $(SOURCES))
 OBJECTS      = $(patsubst %.c,%.o,$(RMVDIRS))
-JNIHDRS      = -I /usr/lib/jvm/java-7-openjdk-amd64/include -I /usr/lib/jvm/java-7-openjdk-amd64/include/linux
+##Linux
+JNIHDRS      = -I /opt/jdk/include -I /opt/jdk/include/linux
 LIBSECP256K1 = libsecp256k1.a
 LIBCRYPTO    = libbitcoin-crypto.so
 

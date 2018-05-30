@@ -5,7 +5,8 @@ SUBDIRS   = src jni
 SOURCES   = $(wildcard *.c src/*.c jni/*.c)
 RMVDIRS   = $(notdir $(SOURCES))
 OBJECTS   = $(patsubst %.c,%.o,$(RMVDIRS))
-JNIHDRS   = -I /usr/lib/jvm/java-7-openjdk-amd64/include -I /usr/lib/jvm/java-7-openjdk-amd64/include/linux
+##Linux
+JNIHDRS      = -I /opt/jdk/include -I /opt/jdk/include/linux
 LIBCRYPTO = libiota-crypto.so
 
 

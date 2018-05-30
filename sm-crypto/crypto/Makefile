@@ -5,7 +5,8 @@ SUBDIRS = sm4 jni
 SOURCES = $(wildcard *.c sm4/*.c jni/*.c)
 RMVDIRS = $(notdir $(SOURCES))
 OBJECTS = $(patsubst %.c,%.o,$(RMVDIRS))
-JNIHDRS = -I /usr/lib/jvm/java-7-openjdk-amd64/include -I /usr/lib/jvm/java-7-openjdk-amd64/include/linux
+##Linux
+JNIHDRS      = -I /opt/jdk/include -I /opt/jdk/include/linux
 LIBSM4  = libsm-crypto.so
 
 
