@@ -12,4 +12,5 @@ do
     cd $code_path
     make clean;make
     cp *.so $output
+    make clean
 done
