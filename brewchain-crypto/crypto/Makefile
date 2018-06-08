@@ -7,9 +7,9 @@ RMVDIRS      = $(notdir $(SOURCES))
 OBJECTS      = $(patsubst %.c,%.o,$(RMVDIRS))
 
 ##Linux
-JNIHDRS      = -I /opt/jdk/include -I /opt/jdk/include/linux
+# JNIHDRS      = -I /opt/jdk/include -I /opt/jdk/include/linux
 ## MacOS
-#JNIHDRS      = -I /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/include -I /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/include/darwin
+JNIHDRS      = -I /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/include -I /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/include/darwin
 
 LIBSECP256K1 = libsecp256k1.a
 LIBCRYPTO    = libbrewchain-crypto.so

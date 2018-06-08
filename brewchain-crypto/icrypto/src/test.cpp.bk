@@ -1,0 +1,261 @@
+#include "icrypto.h"
+  
+
+  
+int main(void) 
+{ 
+   // define standard 256-bit EC 
+   IppsECCPState* pECP = newStd_256_ECP(); 
+   IppECResult eccResult; 
+        IppsECCPPointState* newephPublic = newECP_256_Point();
+
+
+   // extract or use any other way to get order(ECP) 
+   const Ipp32u secp256r1_r[] = {0xFC632551, 0xF3B9CAC2, 0xA7179E84, 0xBCE6FAAD,0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF}; 
+   const int ordSize = sizeof(secp256r1_r)/sizeof(Ipp32u); 
+   IppsBigNumState* pECPorder = newBN(ordSize, secp256r1_r); 
+  
+   dumpHex((Ipp8u*)&secp256r1_r,0,sizeof(secp256r1_r));
+   //initPRNG();
+   // define a message to be signed; let it be random, for example 
+   IppsPRNGState* pRandGen = newPRNG(); // 'external' PRNG 
+  
+   Ipp32u tmpData[ordSize]; 
+   //ippsPRNGen(tmpData, 256, pRandGen); 
+
+
+   //IppsBigNumState* pRandMsg = newBN(ordSize, tmpData);  // random 256-bit message 
+   Ipp8u message[] = "hello cwv";
+   int size = (sizeof(message)-1+3)/4;
+   printf("message=%d, %ld=",size,sizeof(message));
+   dumpHex((Ipp8u*)message,0,sizeof(message));
+   
+   IppsBigNumState* pRandMsg = newBN(size,0);
+
+   ippsSetOctString_BN(message, sizeof(message)-1, pRandMsg);
+
+   Type_BN("Big Number value is:\n", pRandMsg);
+
+   IppsBigNumState* pMsg = newBN(ordSize, 0);            // msg to be signed 
+   ippsMod_BN(pRandMsg, pECPorder, pMsg); 
+   Type_BN("pMsg:=",pMsg);
+
+
+  
+   // declare Signer's regular and ephemeral key pair 
+   IppsBigNumState* regPrivate = newBN(ordSize, 0); 
+   IppsBigNumState* ephPrivate = newBN(ordSize, 0); 
+
+   // define Signer's ephemeral key pair 
+   IppsECCPPointState* regPublic = newECP_256_Point(); 
+   IppsECCPPointState* ephPublic = newECP_256_Point(); 
+  
+
+   cout<<"okok1"<<endl;
+   // generate regular & ephemeral key pairs, should be different each other 
+   ippsECCPGenKeyPair(regPrivate, regPublic, pECP, ippsPRNGen, pRandGen); 
+   
+   cout<<"okok2"<<endl;
+  
+   ippsECCPGenKeyPair(ephPrivate, ephPublic, pECP, ippsPRNGen, pRandGen);
+
+   printf("regPublic=");
+
+   dumpHex(regPublic);
+   printf("ephPublic=");
+   dumpHex(ephPublic);
+
+
+   Type_BN("regPrivate=",regPrivate);
+   Type_BN("ephPrivate=",ephPrivate);
+   // 
+   // signature 
+   // 
+  
+   // set ephemeral key pair 
+   ippsECCPSetKeyPair(ephPrivate, ephPublic, ippFalse, pECP); 
+   // compure signature 
+   IppsBigNumState* signX = newBN(ordSize, 0); 
+   IppsBigNumState* signY = newBN(ordSize, 0); 
+   cout<<"okok3"<<endl;
+
+
+ippsECCPGetPoint(signX,signY,regPublic,pECP);
+   Type_BN("signX=",signX);
+   Type_BN("signY=",signY);
+
+      ippsECCPSetPoint(signX,signY,newephPublic,pECP);
+      //ippsECCPSetPoint(newsignX,newsignY,newephPublic,pECPnew);
+
+   printf("newpub:");
+   dumpHex(newephPublic);
+
+
+   ippsECCPCheckPoint(newephPublic,&eccResult,pECP);
+
+   cout << "CheckPoint: "<< ippsECCGetResultString(eccResult)<<endl;
+
+
+
+
+   ippsECCPSignDSA(pMsg, regPrivate, signX, signY, pECP); 
+  
+   Type_BN("signedX=",signX);
+   Type_BN("signedY=",signY);
+
+   ippsECCPSetKeyPair(NULL, newephPublic, ippTrue, pECP); 
+
+
+   {
+      ippsECCPVerifyDSA(pMsg, signX,signY, &eccResult, pECP); 
+   }
+
+   if(ippECValid == eccResult) 
+      cout << "signature verificatioin passed" <<endl; 
+   else 
+      cout << "signature verificatioin failed" <<endl; 
+   
+
+
+  
+   cout<<"okok4"<<endl;
+   // 
+   // verification 
+   // 
+   //ippsECCPSetKeyPair(NULL, regPublic, ippTrue, pECP);
+   cout<<"okok5"<<endl; 
+      // delete [] (Ipp8u*)signX; 
+   // delete [] (Ipp8u*)signY; 
+    // signX = newBN(ordSize, 0); 
+    // signY = newBN(ordSize, 0); 
+
+      // delete [] (Ipp8u*)pECP; 
+
+   // IppsECCPState* ornew = newStd_256_ECP(); 
+   // ippsECCPGenKeyPair(ephPrivate, ephPublic, ornew, ippsPRNGen, pRandGen);
+   // ippsECCPGenKeyPair(regPrivate, regPublic, ornew, ippsPRNGen, pRandGen);
+   //  delete [] (Ipp8u*)ornew; 
+
+   // Type_BN("newregPrivate=",regPrivate);
+   // Type_BN("newephPrivate=",ephPrivate);
+   // ippsECCPSignDSA(pMsg, ephPrivate, signX, signY, ornew); 
+
+   // Type_BN("nsignX=",signX);
+   // Type_BN("nsignY=",signY);
+
+   IppsECCPState* pECPnew = newStd_256_ECP(); 
+   // ippsECCPGenKeyPair(ephPrivate, ephPublic, pECP, ippsPRNGen, pRandGen);
+   //ippsECCPGenKeyPair(regPrivate, regPublic, pECPnew, ippsPRNGen, pRandGen);
+   char pubkeystr[]="8573614B020000000400000000000000F82DC086E87F00006F758542E3DF964877FDB892E1ECDEDB42AAFEE1443463E5F3ECFD1DB10FA9F44F007CB49C007CAA99C0C9CE8238222426B13F32FACA0575293BF443438D131774D4EB916E9ECC59915B1528C54777AD5FEFB9963AA1943D24AA36BA271EB155";
+
+
+
+ /*  const Ipp32u GX[]={0x13cbfc82,0x68c38bb9,0x46646989,0x8ef57328,0x4a96b568};
+   printf("GX=V:");
+   dumpHex((Ipp32u*)GX,0,5);
+
+   char GXStr[]="13CBFC8268C38BB9466469898EF573284A96B568";
+   Ipp8u *GXBB = new Ipp8u[size/2];
+   octexToByte((Ipp8u*)GXBB,GXStr,size/2);
+   printf("GX=R:");
+   dumpHex((Ipp32u*)GXBB,0,5);
+   Ipp32u *GXBB32= new Ipp32u[size/8];
+   octexToByte((Ipp32u*)GXBB32,GXStr,size/2);
+
+   printf("GX=S:");
+   dumpHex((Ipp32u*)GXBB32,0,5);
+
+*/
+
+   char signxstr[] = "C61AE75A1BD30A255A2F45BA53C3EACDD2F8756B957A61A5D6C2024F95E101EF";
+   char signystr[] = "02359A55F6255BB228E5CB65CD4A110EA3450EA2AAC11CBBE06D6635286CB504";
+
+   char signedxstr[] = "FF68C8CAA51215DBF33183EE4271BEFBDC7D8C5CC0E9DD6664FCE81C175F02FA";
+   char signedystr[] = "DE186A8C74C7036E17434F2722840EDB4FB5D7E2A7CBC8F8DC4C9970F2259952";
+
+
+   size = strlen(signystr);
+
+/*
+   Ipp32u *signxbb = new Ipp32u[size/8];
+   Ipp32u *signybb = new Ipp32u[size/8];
+   
+   octexToByte(signxbb,signxstr,size/8);
+   octexToByte(signybb,signystr,size/8);
+   dumpHex(signxbb,0,size/8);
+   dumpHex(signybb,0,size/8);
+  
+  */ 
+
+   Ipp8u *signxbb = new Ipp8u[size/2];
+   Ipp8u *signybb = new Ipp8u[size/2];
+   
+   octexToByte(signxbb,signxstr,size/2);
+   octexToByte(signybb,signystr,size/2);
+   dumpHex(signxbb,0,size/2);
+   dumpHex(signybb,0,size/2);
+ 
+
+   IppsBigNumState* newsignX = newBN(ordSize, 0); 
+   IppsBigNumState* newsignY = newBN(ordSize, 0); 
+
+   ippsSetOctString_BN(signxbb,size/2,newsignX);
+   ippsSetOctString_BN(signybb,size/2,newsignY);
+   printf("aa==:ordSize=%d==%d==\n",ordSize,size);
+   // dumpHex((Ipp32u*)newsignX,0,ordSize);
+
+   Type_BN("newsignX=",newsignX);
+   Type_BN("newsignY=",newsignY);
+
+
+   octexToByte(signxbb,signedxstr,size/2);
+   octexToByte(signybb,signedystr,size/2);
+   dumpHex(signxbb,0,size/2);
+   dumpHex(signybb,0,size/2);
+
+   IppsBigNumState* newsignedX = newBN(ordSize, 0); 
+   IppsBigNumState* newsignedY = newBN(ordSize, 0); 
+
+   ippsSetOctString_BN(signxbb,size/2,newsignedX);
+   ippsSetOctString_BN(signybb,size/2,newsignedY);
+
+
+   ippsECCPSetPoint(newsignX,newsignY,newephPublic,pECPnew);
+      //ippsECCPSetPoint(newsignX,newsignY,newephPublic,pECPnew);
+
+   printf("newpub:");
+   dumpHex(newephPublic);
+
+
+   ippsECCPCheckPoint(newephPublic,&eccResult,pECPnew);
+
+   cout << "CheckPoint: "<< ippsECCGetResultString(eccResult)<<endl;
+
+   ippsECCPSetKeyPair(NULL, newephPublic, ippTrue, pECPnew);
+
+   //for(int i=0;i<100;i++)
+   {
+      ippsECCPVerifyDSA(pMsg, newsignedX,newsignedY , &eccResult,pECPnew); 
+   }
+   
+   cout << "SignResult: "<< ippsECCGetResultString(eccResult)<<endl;
+
+   // if(ippECValid == eccResult)
+      // cout << "signature verificatioin passed" <<endl; 
+   // else 
+      // cout << "signature verificatioin failed" <<endl; 
+  
+   delete [] (Ipp8u*)signX; 
+   delete [] (Ipp8u*)signY; 
+   delete [] (Ipp8u*)ephPublic; 
+   delete [] (Ipp8u*)regPublic; 
+   delete [] (Ipp8u*)ephPrivate; 
+   delete [] (Ipp8u*)regPrivate; 
+   delete [] (Ipp8u*)pRandMsg; 
+   delete [] (Ipp8u*)pMsg; 
+   delete [] (Ipp8u*)pRandGen; 
+   delete [] (Ipp8u*)pECPorder; 
+   // delete [] (Ipp8u*)pECPnew; 
+   return 0; 
+} 
+
