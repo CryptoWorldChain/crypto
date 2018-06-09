@@ -193,27 +193,37 @@ unique_ptr<Ipp8u[]> autoECP_256_Point(void)
 
 
 
-void initPRNG(IppsPRNGState* pCtx) 
+void initPRNG(IppsPRNGState* pCtx, int len ,const Ipp32u* pData) 
 { 
-   clock_t start = clock();
-
-   std::chrono::milliseconds epoch = std::chrono::duration_cast< std::chrono::milliseconds >(
-        std::chrono::system_clock::now().time_since_epoch()
-    );
-   long count = epoch.count();
    // Ipp8u *data = new Ipp8u[sizeof(long)*2];
-   unique_ptr<Ipp8u[]> data(new Ipp8u[sizeof(long)*2]);
+   if(pData==NULL){
+         clock_t start = clock();
+         std::chrono::milliseconds epoch = std::chrono::duration_cast< std::chrono::milliseconds >(
+              std::chrono::system_clock::now().time_since_epoch()
+          );
+         long count = epoch.count();
+         int size = sizeof(long)*2;
+         unique_ptr<Ipp8u[]> data(new Ipp8u[size]);
+         memcpy(data.get(),&count,sizeof(long));
+         memcpy(&data.get()[sizeof(long)],&start,sizeof(long));
+         // for(int i=0;i<size;i++)
+         // {
+         //    data.get()[i] = 3;
+         //  }
+          IppsBigNumState *seedbn=(IppsBigNumState*)autoBN(size/4,(Ipp32u*)data.get()).get();
+          ippsPRNGSetSeed(seedbn, pCtx);
+         // printf("%ld micro seconds, tick %ld since the epoch began:%ld:\n", (long)epoch.count(),(long)start,sizeof(long));      
+    }else{
+       IppsBigNumState *seedbn=(IppsBigNumState*)autoBN(len,pData).get();
+       ippsPRNGSetSeed(seedbn, pCtx);
+    }
 
-   memcpy(data.get(),&count,sizeof(long));
-   memcpy(&data.get()[sizeof(long)],&start,sizeof(long));
 
-   // printf("%ld micro seconds, tick %ld since the epoch began:%ld:\n", (long)epoch.count(),(long)start,sizeof(long));
 
-   IppsBigNumState *seedbn=(IppsBigNumState*)autoBN(sizeof(long)*2,(Ipp32u*)data.get()).get();
 
-   // dumpHex(seedbn);
+   // dumpHex("seednd=",seedbn);
 
-   ippsPRNGSetSeed(seedbn, pCtx);
+   
    // delete [] (Ipp8u*)seedbn; 
    // delete [] (Ipp8u*)data; 
    
@@ -231,8 +241,7 @@ IppsPRNGState* newPRNG(void)
    return pCtx; 
 } 
 
-
-unique_ptr<Ipp8u[]> autoPRNG(void) 
+unique_ptr<Ipp8u[]> autoPRNG(int size ,const Ipp32u* pData) 
 { 
    int ctxSize; 
    ippsPRNGGetSize(&ctxSize); 
@@ -240,7 +249,7 @@ unique_ptr<Ipp8u[]> autoPRNG(void)
    unique_ptr<Ipp8u[]> pn(new Ipp8u[ctxSize]);
    IppsPRNGState* pCtx = (IppsPRNGState*)pn.get();
    ippsPRNGInit(256, pCtx);
-   initPRNG(pCtx);
+   initPRNG(pCtx,size,pData);
    return move(pn); 
 } 
 

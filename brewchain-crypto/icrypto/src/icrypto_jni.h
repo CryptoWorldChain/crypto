@@ -21,7 +21,7 @@ JNIEXPORT void JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_init
  * Signature: ([B[B[B)V
  */
 JNIEXPORT void JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_genKeys
-  (JNIEnv *, jobject, jbyteArray, jbyteArray, jbyteArray);
+  (JNIEnv *, jobject,jbyteArray, jbyteArray, jbyteArray, jbyteArray);
 
 
 /*

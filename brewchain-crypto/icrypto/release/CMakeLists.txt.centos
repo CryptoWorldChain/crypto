@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 2.8)
+
+
+
+project(icrypto)
+
+
+set (ICRYPTO_VERSION_MAJOR 1)
+set (ICRYPTO_VERSION_MINOR 0)
+
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
+
+include_directories( /opt/intel/ipp/include)
+LINK_DIRECTORIES(/opt/intel/ipp/lib)
+
+include_directories( /opt/intel/ippcp/include)
+LINK_DIRECTORIES(/opt/intel/ippcp/lib/intel64)
+
+
+include_directories(/usr/java/jdk1.7.0_80/include)
+include_directories(/usr/java/jdk1.7.0_80/include/linux)
+
+add_executable(test 
+	src/test.cpp 
+	src/utils.cpp 
+	src/IppEnc.cpp 
+	src/icrypto_impl.cpp
+)
+
+
+TARGET_LINK_LIBRARIES(test libippcp.a)
+
+
+add_library(ippcwv SHARED src/utils.cpp 
+	src/IppEnc.cpp 
+	src/icrypto_impl.cpp)
+
+
+TARGET_LINK_LIBRARIES(ippcwv libippcp.a)
+

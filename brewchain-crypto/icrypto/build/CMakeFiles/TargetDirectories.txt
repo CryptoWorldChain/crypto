@@ -1,4 +1,0 @@
-/Users/brew/Documents/BC/codes/tl/chaincore/crypto/brewchain-crypto/icrypto/build/CMakeFiles/rebuild_cache.dir
-/Users/brew/Documents/BC/codes/tl/chaincore/crypto/brewchain-crypto/icrypto/build/CMakeFiles/edit_cache.dir
-/Users/brew/Documents/BC/codes/tl/chaincore/crypto/brewchain-crypto/icrypto/build/CMakeFiles/ippcwv.dir
-/Users/brew/Documents/BC/codes/tl/chaincore/crypto/brewchain-crypto/icrypto/build/CMakeFiles/test.dir

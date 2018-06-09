@@ -1,14 +1,14 @@
 #include "icrypto.h"
 
 
-void genKeyPair(ICKeyPair256 *kp){
+void genKeyPair(ICKeyPair256 *kp,int len,Ipp32u *seed){
 
 	unique_ptr<Ipp8u[]> sECP = autoStd_256_ECP();
 
 	IppsECCPState* pECP = (IppsECCPState*)sECP.get(); 
 	IppECResult eccResult; 
 
-	unique_ptr<Ipp8u[]> agen = autoPRNG();
+	unique_ptr<Ipp8u[]> agen = autoPRNG(len,seed);
 	IppsPRNGState* pRandGen = (IppsPRNGState*)agen.get(); // 'external' PRNG 
 	Ipp32u secp256r1_r[] = {0xC6325F51, 0xFAC23B9C, 0xA7179E84, 0xBCE6FAAD,0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF}; 
 	const int ordSize = sizeof(secp256r1_r)/sizeof(Ipp32u); 

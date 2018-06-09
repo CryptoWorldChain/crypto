@@ -5,11 +5,11 @@
 #include <chrono>
 #include <string> 
 #include "ippcp.h" 
+#include <memory.h>
 #include <memory>
-
 using namespace std; 
 
-#define __DEBUG_
+#define __NODEBUG
 
 #ifndef _Included_ICRYPTO_DLL
 #define _Included_ICRYPTO_DLL
@@ -75,9 +75,9 @@ IppsECCPState* newStd_256_ECP(void) ;
 
 IppsECCPPointState* newECP_256_Point(void) ;
 unique_ptr<Ipp8u[]> autoECP_256_Point(void) ;
-void initPRNG(IppsPRNGState* pCtx);
+void initPRNG(IppsPRNGState* pCtx, int len = 0 ,const Ipp32u* pData=NULL);
 IppsPRNGState* newPRNG(void) ;
-unique_ptr<Ipp8u[]>autoPRNG(void) ;
+unique_ptr<Ipp8u[]>autoPRNG( int len = 0 ,const Ipp32u* pData=NULL) ;
 
 //helper
 
@@ -101,7 +101,7 @@ void octexToByte(Ipp32u*pData,char *HEXStr,int size);
 bool copyBN(ICBignumber ibn,const IppsBigNumState* pBN);
 
 
-void genKeyPair(ICKeyPair256 *kp);
+void genKeyPair(ICKeyPair256 *kp,int len=0,Ipp32u *seed=NULL);
 bool fromPriKey(ICKeyPair256 *kp);
 bool signMessage(ICKeyPair256 *kp,Ipp8u *pMsg);
 

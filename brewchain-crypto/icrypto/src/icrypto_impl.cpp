@@ -21,11 +21,20 @@ JNIEXPORT void JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_init
  * Signature: ([B[B[B)V
  */
 JNIEXPORT void JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_genKeys
-  (JNIEnv *env, jobject obj, jbyteArray p, jbyteArray x, jbyteArray y){
+  (JNIEnv *env, jobject obj,jbyteArray s, jbyteArray p, jbyteArray x, jbyteArray y){
 
 
 	ICKeyPair256 kp;
-   	genKeyPair(&kp);
+	int len = 0;
+	jbyte* seed = NULL;
+	if(s!=NULL){
+		len = env->GetArrayLength(s) / 4;
+		if(len>0)
+		{
+			seed = env->GetByteArrayElements(s, 0);
+		}
+	}
+  	genKeyPair(&kp,len,(Ipp32u*)seed);
 
 	env->SetByteArrayRegion(p, 0,32	,(jbyte*)kp.p);
 	env->SetByteArrayRegion(x, 0,32	,(jbyte*)kp.x);
