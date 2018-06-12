@@ -195,6 +195,11 @@ bool signMessage(ICKeyPair256 *kp,Ipp8u *message){
 		return false;
 	}
 
+	// ippsECCPSetKeyPair(NULL, regPublic, ippTrue, pECP); 
+	// ippsECCPVerifyDSA(pMsg, signedX, signedY, &eccResult,pECP);
+
+	// cout << "CheckPoint: "<< ippsECCGetResultString(eccResult)<<endl;
+	
 	Type_BN("signedX=",signedX);
 	Type_BN("signedY=",signedY);
 	IppsBigNumSGN sgn; 

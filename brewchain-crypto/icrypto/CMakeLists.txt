@@ -7,12 +7,13 @@ project(icrypto)
 
 set (ICRYPTO_VERSION_MAJOR 1)
 set (ICRYPTO_VERSION_MINOR 0)
+set(CMAKE_BUILD_TYPE Release)
+
 
 include_directories( /opt/intel/ipp/include)
-LINK_DIRECTORIES(/opt/intel/ipp/lib)
+LINK_DIRECTORIES(/opt/intel/ippcp/lib)
 
 include_directories( /opt/intel/ippcp/include)
-LINK_DIRECTORIES(/opt/intel/ippcp/lib)
 
 include_directories(/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/include)
 include_directories(/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/include/darwin)
@@ -26,6 +27,9 @@ add_executable(test
 	src/icrypto_impl.cpp
 )
 
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-all_load")
+set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-all_load")
+set(LINK_FLAGS ${LINK_FLAGS} "-WL,-rpath,./libippcwv.dylib")
 
 TARGET_LINK_LIBRARIES(test libippcp.a)
 
