@@ -3,6 +3,8 @@
 #include "icrypto.h"
 
 
+#define RELEASE_ARRAY(__arr,j__arr)  if(j__arr!=NULL){ env->ReleaseByteArrayElements(__arr, j__arr, JNI_ABORT); }
+
 /*
  * Class:     org_brewchain_core_crypto_jni_IPPCrypto
  * Method:    init
@@ -26,20 +28,21 @@ JNIEXPORT void JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_genKeys
 
 	ICKeyPair256 kp;
 	int len = 0;
-	jbyte* seed = NULL;
+	jbyte* js = NULL;
 	if(s!=NULL){
 		len = env->GetArrayLength(s) / 4;
 		if(len>0)
 		{
-			seed = env->GetByteArrayElements(s, 0);
+			js = env->GetByteArrayElements(s, 0);
 		}
 	}
-  	genKeyPair(&kp,len,(Ipp32u*)seed);
+  	genKeyPair(&kp,len,(Ipp32u*)js);
 
 	env->SetByteArrayRegion(p, 0,32	,(jbyte*)kp.p);
 	env->SetByteArrayRegion(x, 0,32	,(jbyte*)kp.x);
 	env->SetByteArrayRegion(y, 0,32	,(jbyte*)kp.y);
 
+  RELEASE_ARRAY(s,js);
   }
 
 JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_fromPrikey
@@ -53,8 +56,10 @@ JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_fromPrik
 	{
 		env->SetByteArrayRegion(x, 0,32	,(jbyte*)kp.x);
 		env->SetByteArrayRegion(y, 0,32	,(jbyte*)kp.y);
+    RELEASE_ARRAY(p,jp);
 		return true;
 	}else{
+    RELEASE_ARRAY(p,jp);
 		return false;
 	}
 
@@ -69,7 +74,7 @@ JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_signMess
   	
   	
   	jbyte* jp =env->GetByteArrayElements(p, 0);
-	jbyte* jx =env->GetByteArrayElements(x, 0);
+	  jbyte* jx =env->GetByteArrayElements(x, 0);
   	jbyte* jy =env->GetByteArrayElements(y, 0);
   	jbyte* jmsg = env->GetByteArrayElements(msg, 0);
   	ICKeyPair256 kp;
@@ -78,10 +83,18 @@ JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_signMess
   	memcpy(kp.y,jy,32);
   	if(signMessage(&kp,(Ipp8u*)jmsg)){
   		env->SetByteArrayRegion(s, 0,32	,(jbyte*)kp.s);
-		env->SetByteArrayRegion(a, 0,32	,(jbyte*)kp.a);
+		  env->SetByteArrayRegion(a, 0,32	,(jbyte*)kp.a);
+      RELEASE_ARRAY(p,jp);
+      RELEASE_ARRAY(x,jx);
+      RELEASE_ARRAY(y,jy);
+      RELEASE_ARRAY(msg,jmsg);
   		return true;
   	}
 
+      RELEASE_ARRAY(p,jp);
+      RELEASE_ARRAY(x,jx);
+      RELEASE_ARRAY(y,jy);
+      RELEASE_ARRAY(msg,jmsg);
 
 
 	return false;
@@ -107,8 +120,22 @@ JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_verifyMe
   	memcpy(kp.s,js,32);
   	memcpy(kp.a,ja,32);
   	if(verifyMessage(&kp,(Ipp8u*)jmsg)){
+
+      RELEASE_ARRAY(x,jx);
+      RELEASE_ARRAY(y,jy);
+      RELEASE_ARRAY(s,js);
+      RELEASE_ARRAY(a,ja);
+      RELEASE_ARRAY(msg,jmsg);
+
   		return true;
   	}
+    RELEASE_ARRAY(x,jx);
+    RELEASE_ARRAY(y,jy);
+    RELEASE_ARRAY(s,js);
+    RELEASE_ARRAY(a,ja);
+    RELEASE_ARRAY(msg,jmsg);
+
+
 	return false;
 
   }
