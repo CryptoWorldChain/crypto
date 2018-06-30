@@ -83,6 +83,38 @@ JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_keccak
   (JNIEnv *, jobject, jbyteArray);
 
 
+/*
+ * Class:     org_brewchain_core_crypto_jni_IPPCrypto
+ * Method:    sha3
+ * Signature: ([B)Ljava/lang/String;
+ */
+JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bsha3
+  (JNIEnv *, jobject, jbyteArray,jbyteArray);
+
+/*
+ * Class:     org_brewchain_core_crypto_jni_IPPCrypto
+ * Method:    sha256
+ * Signature: ([B)Ljava/lang/String;
+ */
+JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bsha256
+  (JNIEnv *, jobject, jbyteArray,jbyteArray);
+
+/*
+ * Class:     org_brewchain_core_crypto_jni_IPPCrypto
+ * Method:    md5
+ * Signature: ([B)Ljava/lang/String;
+ */
+JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bmd5
+  (JNIEnv *, jobject, jbyteArray,jbyteArray);
+
+/*
+ * Class:     org_brewchain_core_crypto_jni_IPPCrypto
+ * Method:    Keccak
+ * Signature: ([B)Ljava/lang/String;
+ */
+JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bkeccak
+  (JNIEnv *, jobject, jbyteArray,jbyteArray);
+
 #ifdef __cplusplus
 }
 #endif

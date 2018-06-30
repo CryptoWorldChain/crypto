@@ -407,6 +407,19 @@ std::string SHA256::operator()(const void* data, size_t numBytes)
 }
 
 
+/// compute SHA256 of a memory block
+void SHA256::operator()(const void* data, size_t numBytes,unsigned char *buffer,size_t len)
+{
+  if(len<HashBytes){
+    memset(buffer,0xFF,len);
+    return;
+  }
+  reset();
+  add(data, numBytes);
+  getHash(buffer);
+}
+
+
 /// compute SHA256 of a string, excluding final zero
 std::string SHA256::operator()(const std::string& text)
 {

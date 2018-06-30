@@ -284,6 +284,48 @@ std::string SHA3::operator()(const void* data, size_t numBytes)
 }
 
 
+void SHA3::operator()(const void* data, size_t numBytes, unsigned char* dst,size_t len)
+{
+  reset();
+  add(data, numBytes);
+  // process remaining bytes
+  processBuffer();
+
+  // number of significant elements in hash (uint64_t)
+  unsigned int hashLength = m_bits / 64;
+
+  // result.reserve(m_bits / 4);
+  int bi = 0;
+  for (unsigned int i = 0; i < hashLength; i++)
+    for (unsigned int j = 0; j < 8; j++) // 64 bits => 8 bytes
+    {
+      // convert a byte to hex
+      unsigned char oneByte = (unsigned char) (m_hash[i] >> (8 * j));
+      if(bi<len)
+      {
+        dst[bi++] = oneByte;
+      }
+      // result += dec2hex[oneByte >> 4];
+      // result += dec2hex[oneByte & 15];
+    }
+
+  // SHA3-224's last entry in m_hash provides only 32 bits instead of 64 bits
+  unsigned int remainder = m_bits - hashLength * 64;
+  unsigned int processed = 0;
+  while (processed < remainder)
+  {
+    // convert a byte to hex
+    unsigned char oneByte = (unsigned char) (m_hash[hashLength] >> processed);
+    // result += dec2hex[oneByte >> 4];
+    // result += dec2hex[oneByte & 15];
+    if(bi<len)
+    {
+        dst[bi++] = oneByte;
+    }
+    processed += 8;
+  }
+}
+
 /// compute SHA3 of a string, excluding final zero
 std::string SHA3::operator()(const std::string& text)
 {

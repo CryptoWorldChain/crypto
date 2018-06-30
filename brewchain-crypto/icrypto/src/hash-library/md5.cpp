@@ -375,6 +375,18 @@ std::string MD5::operator()(const void* data, size_t numBytes)
   return getHash();
 }
 
+/// compute SHA256 of a memory block
+void MD5::operator()(const void* data, size_t numBytes,unsigned char *buffer,size_t len)
+{
+  if(len<HashBytes){
+    memset(buffer,0xFF,len);
+    return;
+  }
+  reset();
+  add(data, numBytes);
+  getHash(buffer);
+}
+
 
 /// compute MD5 of a string, excluding final zero
 std::string MD5::operator()(const std::string& text)

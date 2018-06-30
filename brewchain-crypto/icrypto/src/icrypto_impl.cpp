@@ -9,6 +9,7 @@
 
 #define RELEASE_ARRAY(__arr,j__arr)  if(j__arr!=NULL){ env->ReleaseByteArrayElements(__arr, j__arr, JNI_ABORT); }
 
+typedef unsigned char byte;
 /*
  * Class:     org_brewchain_core_crypto_jni_IPPCrypto
  * Method:    init
@@ -207,3 +208,69 @@ JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_keccak
   }
 
 
+
+JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bsha3
+  (JNIEnv *env, jobject obj, jbyteArray x, jbyteArray o){
+    jbyte* jx =env->GetByteArrayElements(x, 0);
+    int len = env->GetArrayLength(x);
+    int dlen = env->GetArrayLength(o);
+    if(jx!=NULL&&len>0&&dlen>0){
+      SHA3 sha3;
+      unique_ptr<byte[]> d(new byte[dlen]);
+      sha3(jx,len,d.get(),dlen);
+      env->SetByteArrayRegion(o, 0,dlen ,(jbyte*)d.get());
+      RELEASE_ARRAY(x,jx);
+      return true;
+    }
+    RELEASE_ARRAY(x,jx);
+    return false;
+}
+
+JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bsha256
+  (JNIEnv *env, jobject obj, jbyteArray x, jbyteArray o){
+    jbyte* jx =env->GetByteArrayElements(x, 0);
+    int len = env->GetArrayLength(x);
+    int dlen = env->GetArrayLength(o);
+    if(jx!=NULL&&len>0&&dlen>0){
+      SHA256 sha256;
+      unique_ptr<byte[]> d(new byte[dlen]);
+      sha256(jx,len,d.get(),dlen);
+      env->SetByteArrayRegion(o, 0,dlen ,(jbyte*)d.get());
+      RELEASE_ARRAY(x,jx);
+      return true;
+    }
+    RELEASE_ARRAY(x,jx);
+    return false;
+}
+JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bmd5
+  (JNIEnv *env, jobject obj, jbyteArray x, jbyteArray o){
+    jbyte* jx =env->GetByteArrayElements(x, 0);
+    int len = env->GetArrayLength(x);
+    int dlen = env->GetArrayLength(o);
+    if(jx!=NULL&&len>0&&dlen>0){
+      MD5 md5;
+      unique_ptr<byte[]> d(new byte[dlen]);
+      md5(jx,len,d.get(),dlen);
+      env->SetByteArrayRegion(o, 0,dlen ,(jbyte*)d.get());
+      RELEASE_ARRAY(x,jx);
+      return true;
+    }
+    RELEASE_ARRAY(x,jx);
+    return false;
+}
+JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bkeccak
+  (JNIEnv *env, jobject obj, jbyteArray x, jbyteArray o){
+    jbyte* jx =env->GetByteArrayElements(x, 0);
+    int len = env->GetArrayLength(x);
+    int dlen = env->GetArrayLength(o);
+    if(jx!=NULL&&len>0&&dlen>0){
+      Keccak keccak;
+      unique_ptr<byte[]> d(new byte[dlen]);
+      keccak(jx,len,d.get(),dlen);
+      env->SetByteArrayRegion(o, 0,dlen ,(jbyte*)d.get());
+      RELEASE_ARRAY(x,jx);
+      return true;
+    }
+    RELEASE_ARRAY(x,jx);
+    return false;
+}

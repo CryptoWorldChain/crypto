@@ -283,6 +283,54 @@ std::string Keccak::operator()(const void* data, size_t numBytes)
   return getHash();
 }
 
+void Keccak::operator()(const void* data, size_t numBytes, unsigned char* dst,size_t len)
+{
+  reset();
+  add(data, numBytes);
+// process remaining bytes
+  processBuffer();
+  int bi = 0;
+
+  // convert hash to string
+  static const char dec2hex[16 + 1] = "0123456789abcdef";
+
+  // number of significant elements in hash (uint64_t)
+  unsigned int hashLength = m_bits / 64;
+
+  std::string result;
+  for (unsigned int i = 0; i < hashLength; i++)
+    for (unsigned int j = 0; j < 8; j++) // 64 bits => 8 bytes
+    {
+      // convert a byte to hex
+      unsigned char oneByte = (unsigned char) (m_hash[i] >> (8 * j));
+      //result += dec2hex[oneByte >> 4];
+      //result += dec2hex[oneByte & 15];
+      if(bi<len)
+      {
+          dst[bi++] = oneByte;
+      }
+
+    }
+
+  // Keccak224's last entry in m_hash provides only 32 bits instead of 64 bits
+  unsigned int remainder = m_bits - hashLength * 64;
+  unsigned int processed = 0;
+  while (processed < remainder)
+  {
+    // convert a byte to hex
+    unsigned char oneByte = (unsigned char) (m_hash[hashLength] >> processed);
+    // result += dec2hex[oneByte >> 4];
+    // result += dec2hex[oneByte & 15];
+    if(bi<len)
+    {
+        dst[bi++] = oneByte;
+    }
+
+    processed += 8;
+  }
+
+  
+}
 
 /// compute Keccak hash of a string, excluding final zero
 std::string Keccak::operator()(const std::string& text)

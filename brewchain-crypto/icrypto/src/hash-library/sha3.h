@@ -44,6 +44,7 @@ public:
 
   /// compute hash of a memory block
   std::string operator()(const void* data, size_t numBytes);
+  void operator()(const void* data, size_t numBytes,unsigned char *dest,size_t len);
   /// compute hash of a string, excluding final zero
   std::string operator()(const std::string& text);
 

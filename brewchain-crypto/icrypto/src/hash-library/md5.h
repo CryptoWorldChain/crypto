@@ -49,6 +49,9 @@ public:
   /// compute MD5 of a string, excluding final zero
   std::string operator()(const std::string& text);
 
+  void operator()(const void* data, size_t numBytes,unsigned char *buffer,size_t len);
+
+
   /// add arbitrary number of bytes
   void add(const void* data, size_t numBytes);
 
