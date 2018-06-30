@@ -1,13 +1,27 @@
 #include "icrypto.h"
-  
+
+#include "hash-library/sha256.h"
+#include "hash-library/sha3.h"
 
   
 int main(void) 
 { 
 
+   //SHA256 sha256;
+   
+   // for(int i=0;i<1;i++)
+   {
+      SHA256 sha256;
+      //sha3("Hello");
+      std::cout << sha256("Hello World") << std::endl;
+   }
+
+   //return 1;
+   SHA3 sha3;
+   std::cout << sha3("Hello World") << std::endl;
+
    ICKeyPair256 kp;
    genKeyPair(&kp);
-
 
    fromPriKey(&kp);
    // Type_BN("regPrivate=",(IppsBigNumState*)kp.p);

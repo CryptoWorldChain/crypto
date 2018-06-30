@@ -20,7 +20,12 @@ void genKeyPair(ICKeyPair256 *kp,int len,Ipp32u *seed){
 	IppsBigNumState* regPrivate = (IppsBigNumState*)aregPrivate.get();
 	unique_ptr<Ipp8u[]> aregPublic = autoECP_256_Point(); 
 	IppsECCPPointState* regPublic = (IppsECCPPointState*)aregPublic.get(); 
+
+#ifdef __MACOS
 	ippsECCPGenKeyPair(regPrivate, regPublic, pECP, ippsPRNGen, pRandGen);
+#else
+	ippsECCPGenKeyPair(regPrivate, regPublic, pECP, ippsPRNGenRDRAND, pRandGen);
+#endif
 
 	unique_ptr<Ipp8u[]> asignX = autoBN(ordSize,0);
 	unique_ptr<Ipp8u[]> asignY = autoBN(ordSize,0);
@@ -178,7 +183,11 @@ bool signMessage(ICKeyPair256 *kp,Ipp8u *message){
 	unique_ptr<Ipp8u[]> aephPublic = autoECP_256_Point(); 
 	IppsECCPPointState* ephPublic = (IppsECCPPointState*)aephPublic.get(); 
 
+#ifdef __MACOS
 	ippsECCPGenKeyPair(ephPrivate, ephPublic, pECP, ippsPRNGen, pRandGen);
+#else
+	ippsECCPGenKeyPair(ephPrivate, ephPublic, pECP, ippsPRNGenRDRAND, pRandGen);
+#endif
 
 	Type_BN("EOPRI=",ephPrivate);
 	// printf("ephPublic,%d=,%ld=",byteSize,ordSize*sizeof(Ipp32u));
@@ -217,8 +226,8 @@ bool verifyMessage(ICKeyPair256 *kp,Ipp8u *message){
 	IppsECCPState* pECP = (IppsECCPState*)sECP.get(); 
 	IppECResult eccResult; 
 
-	unique_ptr<Ipp8u[]> agen = autoPRNG();
-	IppsPRNGState* pRandGen = (IppsPRNGState*)agen.get(); // 'external' PRNG 
+	//unique_ptr<Ipp8u[]> agen = autoPRNG();
+	//IppsPRNGState* pRandGen = (IppsPRNGState*)agen.get(); // 'external' PRNG 
 	Ipp32u secp256r1_r[] = {0xC6325F51, 0xFAC23B9C, 0xA7179E84, 0xBCE6FAAD,0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF}; 
 	const int ordSize = sizeof(secp256r1_r)/sizeof(Ipp32u); 
 	const int byteSize = sizeof(secp256r1_r); 
@@ -249,7 +258,6 @@ bool verifyMessage(ICKeyPair256 *kp,Ipp8u *message){
    ippsECCPCheckPoint(regPublic,&eccResult,pECP);
 	
    if(eccResult!=ippECValid){
-
    		return false;
    }
    // cout << "CheckPoint: "<< ippsECCGetResultString(eccResult)<<endl;
@@ -287,45 +295,45 @@ bool verifyMessage(ICKeyPair256 *kp,Ipp8u *message){
 
 	ippsECCPVerifyDSA(pMsg, signedX, signedY, &eccResult,pECP);
 		
-#ifdef __DEBUG
-		cout << "CheckPoint: "<< ippsECCGetResultString(eccResult)<<endl;
-#endif
+// #ifdef __DEBUG
+// 		cout << "CheckPoint: "<< ippsECCGetResultString(eccResult)<<endl;
+// #endif
 
 	if(eccResult!=ippECValid){
    		return false;
 	}
-
-	dumpHex("VerifySuccess=",(Ipp8u*)message,0,sizeof(message));
-
-//test..
-	{
-		unique_ptr<Ipp8u[]> sECP = autoStd_256_ECP();
-
-		IppsECCPState* pECP = (IppsECCPState*)sECP.get(); 
-
-		unique_ptr<Ipp8u[]> aTregPublic = autoECP_256_Point(); 
-		IppsECCPPointState* TregPublic = (IppsECCPPointState*)aregPublic.get(); 
-		IppStatus status=ippsECCPSetPoint(signedX,signedY,TregPublic,pECP);
-		if(status==ippStsNoErr){
-			dumpHex("DumpPublicOKOK=",(Ipp8u*)TregPublic,0,sizeof(TregPublic));
-
-			unique_ptr<Ipp8u[]> asignX = autoBN(ordSize,0);
-			unique_ptr<Ipp8u[]> asignY = autoBN(ordSize,0);
-		   	IppsBigNumState* signX = (IppsBigNumState*)asignX.get();
-		   	IppsBigNumState* signY = (IppsBigNumState*)asignY.get();
-
-			ippsECCPGetPoint(signX,signY,regPublic,pECP);
-		   	Type_BN("OX=",signX);
-		   	Type_BN("OY=",signY);
-
-
-
-		}else{
-			printf("\nNOT OK::%s\n",ippcpGetStatusString(status));
-		}
-
-	}
-
 	return true;
+// 	dumpHex("VerifySuccess=",(Ipp8u*)message,0,sizeof(message));
+
+// //test..
+// 	{
+// 		unique_ptr<Ipp8u[]> sECP = autoStd_256_ECP();
+
+// 		IppsECCPState* pECP = (IppsECCPState*)sECP.get(); 
+
+// 		unique_ptr<Ipp8u[]> aTregPublic = autoECP_256_Point(); 
+// 		IppsECCPPointState* TregPublic = (IppsECCPPointState*)aregPublic.get(); 
+// 		IppStatus status=ippsECCPSetPoint(signedX,signedY,TregPublic,pECP);
+// 		if(status==ippStsNoErr){
+// 			dumpHex("DumpPublicOKOK=",(Ipp8u*)TregPublic,0,sizeof(TregPublic));
+
+// 			unique_ptr<Ipp8u[]> asignX = autoBN(ordSize,0);
+// 			unique_ptr<Ipp8u[]> asignY = autoBN(ordSize,0);
+// 		   	IppsBigNumState* signX = (IppsBigNumState*)asignX.get();
+// 		   	IppsBigNumState* signY = (IppsBigNumState*)asignY.get();
+
+// 			ippsECCPGetPoint(signX,signY,regPublic,pECP);
+// 		   	Type_BN("OX=",signX);
+// 		   	Type_BN("OY=",signY);
+
+
+
+// 		}else{
+// 			printf("\nNOT OK::%s\n",ippcpGetStatusString(status));
+// 		}
+
+// 	}
+
+	// return true;
 
 }

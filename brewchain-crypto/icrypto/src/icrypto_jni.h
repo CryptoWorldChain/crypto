@@ -48,6 +48,41 @@ JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_signMess
 JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_verifyMessage
   (JNIEnv *, jobject, jbyteArray, jbyteArray, jbyteArray, jbyteArray, jbyteArray);
 
+
+
+/*
+ * Class:     org_brewchain_core_crypto_jni_IPPCrypto
+ * Method:    sha3
+ * Signature: ([B)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_sha3
+  (JNIEnv *, jobject, jbyteArray);
+
+/*
+ * Class:     org_brewchain_core_crypto_jni_IPPCrypto
+ * Method:    sha256
+ * Signature: ([B)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_sha256
+  (JNIEnv *, jobject, jbyteArray);
+
+/*
+ * Class:     org_brewchain_core_crypto_jni_IPPCrypto
+ * Method:    md5
+ * Signature: ([B)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_md5
+  (JNIEnv *, jobject, jbyteArray);
+
+/*
+ * Class:     org_brewchain_core_crypto_jni_IPPCrypto
+ * Method:    Keccak
+ * Signature: ([B)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_keccak
+  (JNIEnv *, jobject, jbyteArray);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -9,7 +9,9 @@
 #include <memory>
 using namespace std; 
 
-#define __NODEBUG
+#define __NDEBUG
+#define __MACOS
+
 
 #ifndef _Included_ICRYPTO_DLL
 #define _Included_ICRYPTO_DLL

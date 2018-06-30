@@ -25,6 +25,18 @@ add_executable(test
 	src/utils.cpp 
 	src/IppEnc.cpp 
 	src/icrypto_impl.cpp
+	src/utils.cpp
+	src/icrypto_impl.cpp
+	src/test.cpp
+	src/IppEnc.cpp
+	#src/hash-library/digest.cpp
+	src/hash-library/md5.cpp
+	src/hash-library/crc32.cpp
+	#src/hash-library/tests/tests.cpp
+	src/hash-library/sha1.cpp
+	src/hash-library/sha3.cpp
+	src/hash-library/sha256.cpp
+	src/hash-library/keccak.cpp
 )
 
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-all_load")
@@ -36,7 +48,21 @@ TARGET_LINK_LIBRARIES(test libippcp.a)
 
 add_library(ippcwv SHARED src/utils.cpp 
 	src/IppEnc.cpp 
-	src/icrypto_impl.cpp)
+	src/icrypto_impl.cpp
+	src/utils.cpp
+	src/icrypto_impl.cpp
+	src/test.cpp
+	src/IppEnc.cpp
+	#src/hash-library/digest.cpp
+	src/hash-library/md5.cpp
+	src/hash-library/crc32.cpp
+	#src/hash-library/tests/tests.cpp
+	src/hash-library/sha1.cpp
+	src/hash-library/sha3.cpp
+	src/hash-library/sha256.cpp
+	src/hash-library/keccak.cpp
+
+	)
 
 
 TARGET_LINK_LIBRARIES(ippcwv libippcp.a)

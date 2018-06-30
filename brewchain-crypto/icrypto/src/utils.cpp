@@ -197,6 +197,7 @@ void initPRNG(IppsPRNGState* pCtx, int len ,const Ipp32u* pData)
 { 
    // Ipp8u *data = new Ipp8u[sizeof(long)*2];
    if(pData==NULL){
+    #ifdef __MACOS
          clock_t start = clock();
          std::chrono::milliseconds epoch = std::chrono::duration_cast< std::chrono::milliseconds >(
               std::chrono::system_clock::now().time_since_epoch()
@@ -206,12 +207,11 @@ void initPRNG(IppsPRNGState* pCtx, int len ,const Ipp32u* pData)
          unique_ptr<Ipp8u[]> data(new Ipp8u[size]);
          memcpy(data.get(),&count,sizeof(long));
          memcpy(&data.get()[sizeof(long)],&start,sizeof(long));
-         // for(int i=0;i<size;i++)
-         // {
-         //    data.get()[i] = 3;
-         //  }
+            dumpHex(data.get(),0,size);
+
           IppsBigNumState *seedbn=(IppsBigNumState*)autoBN(size/4,(Ipp32u*)data.get()).get();
           ippsPRNGSetSeed(seedbn, pCtx);
+    #endif
          // printf("%ld micro seconds, tick %ld since the epoch began:%ld:\n", (long)epoch.count(),(long)start,sizeof(long));      
     }else{
        IppsBigNumState *seedbn=(IppsBigNumState*)autoBN(len,pData).get();
