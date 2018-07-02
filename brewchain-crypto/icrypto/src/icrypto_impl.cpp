@@ -226,16 +226,19 @@ JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bsha3
     return false;
 }
 
+
 JNIEXPORT jboolean JNICALL Java_org_brewchain_core_crypto_jni_IPPCrypto_bsha256
   (JNIEnv *env, jobject obj, jbyteArray x, jbyteArray o){
     jbyte* jx =env->GetByteArrayElements(x, 0);
     int len = env->GetArrayLength(x);
     int dlen = env->GetArrayLength(o);
-    if(jx!=NULL&&len>0&&dlen>0){
-      SHA256 sha256;
+    if(jx!=NULL&&len>0&&dlen==32){
+
       unique_ptr<byte[]> d(new byte[dlen]);
+      SHA256 sha256;
       sha256(jx,len,d.get(),dlen);
-      env->SetByteArrayRegion(o, 0,dlen ,(jbyte*)d.get());
+      // ippSHA256((Ipp8u *)jx,len,(Ipp8u *)d.get());
+      env->SetByteArrayRegion(o, 0, dlen ,(jbyte*)d.get());
       RELEASE_ARRAY(x,jx);
       return true;
     }

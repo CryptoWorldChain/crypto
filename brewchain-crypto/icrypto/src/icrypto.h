@@ -109,5 +109,7 @@ bool signMessage(ICKeyPair256 *kp,Ipp8u *pMsg);
 
 bool verifyMessage(ICKeyPair256 *kp,Ipp8u *pMsg);
 
+bool ippSHA256(Ipp8u *msg,int len,Ipp8u *digest);
+
 #endif
 

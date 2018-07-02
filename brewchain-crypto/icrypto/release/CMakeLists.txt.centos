@@ -7,6 +7,7 @@ project(icrypto)
 
 set (ICRYPTO_VERSION_MAJOR 1)
 set (ICRYPTO_VERSION_MINOR 0)
+set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
@@ -21,11 +22,24 @@ LINK_DIRECTORIES(/opt/intel/ippcp/lib/intel64)
 include_directories(/usr/java/jdk1.7.0_80/include)
 include_directories(/usr/java/jdk1.7.0_80/include/linux)
 
+
 add_executable(test 
 	src/test.cpp 
 	src/utils.cpp 
 	src/IppEnc.cpp 
 	src/icrypto_impl.cpp
+	src/utils.cpp
+	src/icrypto_impl.cpp
+	src/test.cpp
+	src/IppEnc.cpp
+	#src/hash-library/digest.cpp
+	src/hash-library/md5.cpp
+	src/hash-library/crc32.cpp
+	#src/hash-library/tests/tests.cpp
+	src/hash-library/sha1.cpp
+	src/hash-library/sha3.cpp
+	src/hash-library/sha256.cpp
+	src/hash-library/keccak.cpp
 )
 
 
@@ -34,7 +48,21 @@ TARGET_LINK_LIBRARIES(test libippcp.a)
 
 add_library(ippcwv SHARED src/utils.cpp 
 	src/IppEnc.cpp 
-	src/icrypto_impl.cpp)
+	src/icrypto_impl.cpp
+	src/utils.cpp
+	src/icrypto_impl.cpp
+	src/test.cpp
+	src/IppEnc.cpp
+	#src/hash-library/digest.cpp
+	src/hash-library/md5.cpp
+	src/hash-library/crc32.cpp
+	#src/hash-library/tests/tests.cpp
+	src/hash-library/sha1.cpp
+	src/hash-library/sha3.cpp
+	src/hash-library/sha256.cpp
+	src/hash-library/keccak.cpp
+
+	)
 
 
 TARGET_LINK_LIBRARIES(ippcwv libippcp.a)

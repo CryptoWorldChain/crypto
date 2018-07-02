@@ -219,6 +219,23 @@ bool signMessage(ICKeyPair256 *kp,Ipp8u *message){
 }
 
 
+bool ippSHA256(Ipp8u *msg,int len,Ipp8u *digest){
+
+	int ctxSize; // context size// computing the context size
+    ippsSHA256GetSize(&ctxSize);// context for the first half of message
+    unique_ptr<Ipp8u[]> actx(new Ipp8u[ctxSize]);
+
+    IppsSHA256State* ctx=(IppsSHA256State*)actx.get();// context initialization 
+    
+    ippsSHA256Init(ctx);// message example
+
+    ippsSHA256Update(msg, len, ctx);// context for the entire message digest
+    IppStatus status = ippsSHA256Final(digest, ctx);
+
+    return status==ippStsNoErr;
+
+}
+
 bool verifyMessage(ICKeyPair256 *kp,Ipp8u *message){
 
 	unique_ptr<Ipp8u[]> sECP = autoStd_256_ECP();
