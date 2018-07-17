@@ -5,21 +5,21 @@
 #include "crypto.h"
 
 
-JNIEXPORT jlong JNICALL Java_crypto_EthereumCrypto_createContext(
+JNIEXPORT jlong JNICALL Java_org_brewchain_core_crypto_jni_Crypto_createContext(
         JNIEnv *env, jobject this)
 {
     return (uintptr_t)create_context();
 }
 
 
-JNIEXPORT void JNICALL Java_crypto_EthereumCrypto_destroyContext(
+JNIEXPORT void JNICALL Java_org_brewchain_core_crypto_jni_Crypto_destroyContext(
         JNIEnv *env, jobject this, jlong context_)
 {
     destroy_context((void *)(uintptr_t)context_);
 }
 
 
-JNIEXPORT jobjectArray JNICALL Java_crypto_EthereumCrypto_createAccount(
+JNIEXPORT jobjectArray JNICALL Java_org_brewchain_core_crypto_jni_Crypto_createAccount(
         JNIEnv *env, jobject this, jlong context_)
 {
     const void *context;
@@ -47,7 +47,7 @@ JNIEXPORT jobjectArray JNICALL Java_crypto_EthereumCrypto_createAccount(
 }
 
 
-JNIEXPORT jobjectArray JNICALL Java_crypto_EthereumCrypto_recoverAccount(
+JNIEXPORT jobjectArray JNICALL Java_org_brewchain_core_crypto_jni_Crypto_recoverAccount(
         JNIEnv *env, jobject this, jlong context_, jstring prikey_)
 {
     const void *context;
@@ -74,7 +74,7 @@ JNIEXPORT jobjectArray JNICALL Java_crypto_EthereumCrypto_recoverAccount(
 }
 
 
-JNIEXPORT jstring JNICALL Java_crypto_EthereumCrypto_signTransaction(
+JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_Crypto_signTransaction(
         JNIEnv *env, jobject this, jlong context_, jstring prikey_,
         jstring nonce_, jstring to_, jstring gasPrice_, jstring gasLimit_,
         jstring value_, jstring data_)
@@ -113,12 +113,15 @@ JNIEXPORT jstring JNICALL Java_crypto_EthereumCrypto_signTransaction(
 }
 
 
-JNIEXPORT jint JNICALL Java_crypto_EthereumCrypto_verifySignature(
-        JNIEnv *env, jobject this, jlong context_,
+JNIEXPORT jint JNICALL Java_org_brewchain_core_crypto_jni_Crypto_verifySignature(
+        JNIEnv *env, jobject this, jlong context_,jstring pubKey_, 
         jbyteArray msgHash_, jbyteArray sigData_)
 {
     unsigned char *msgHash;
     unsigned char *sigData;
+
+    const char *pubKey;
+    int nResult =0;
 
     size_t msgLen;
     size_t sigLen;
@@ -126,11 +129,64 @@ JNIEXPORT jint JNICALL Java_crypto_EthereumCrypto_verifySignature(
 
     context = (const void *)(uintptr_t)context_;
 
+    pubKey = (*env)->GetStringUTFChars(env, pubKey_, JNI_FALSE);
+
     msgHash = (unsigned char *)(*env)->GetByteArrayElements(env, msgHash_, JNI_FALSE);
     msgLen = (size_t)(*env)->GetArrayLength(env, msgHash_);
 
     sigData = (unsigned char *)(*env)->GetByteArrayElements(env, sigData_, JNI_FALSE);
     sigLen = (size_t)(*env)->GetArrayLength(env, sigData_);
 
-    return (jint)verify_signature(context, msgHash, msgLen, sigData, sigLen);
+    nResult = verify_signature(context, pubKey ,msgHash, msgLen, sigData, sigLen);
+
+    (*env)->ReleaseStringUTFChars(env, pubKey_, pubKey);
+
+    return (jint)nResult;
 }
+
+
+JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_Crypto_signData(
+        JNIEnv *env, jobject this, jlong context_, jstring prikey_,jstring data_)
+{
+    const void *context;
+    const char *prikey;
+   
+    const char *data;
+    uint8_t sigbuf[8192]={0};
+
+    context = (const void *)(uintptr_t)context_;
+
+    prikey = (*env)->GetStringUTFChars(env, prikey_, JNI_FALSE);
+    data = (*env)->GetStringUTFChars(env, data_, JNI_FALSE);
+
+    printf("data=%s\r\n", data);
+
+    sign_Data(context, prikey, data, sigbuf); 
+
+    (*env)->ReleaseStringUTFChars(env, prikey_, prikey);
+    (*env)->ReleaseStringUTFChars(env, data_, data);
+
+    return (*env)->NewStringUTF(env, (char *)sigbuf);
+}
+
+
+
+JNIEXPORT jstring JNICALL Java_org_brewchain_core_crypto_jni_Crypto_Datahash(
+        JNIEnv *env, jobject this, jlong context_,jstring data_)
+{
+    const void *context;
+    const char *data;
+    uint8_t hashbuf[8192]={0};
+
+    context = (const void *)(uintptr_t)context_;
+    data = (*env)->GetStringUTFChars(env, data_, JNI_FALSE);
+
+    Data_hash(context, data, hashbuf); 
+
+    (*env)->ReleaseStringUTFChars(env, data_, data);
+
+    return (*env)->NewStringUTF(env, (char *)hashbuf);
+}
+
+
+
