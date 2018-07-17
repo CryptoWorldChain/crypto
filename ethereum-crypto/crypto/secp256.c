@@ -72,6 +72,8 @@ int secp256_sign_transaction(const secp256k1_context *context,
     secp256k1_ecdsa_recoverable_signature_serialize_compact(
             context, sigbuf, &recover_id, &raw_sig);
 
+   printf("recover_id=%d \r\n", (uint8_t)recover_id);
+ 
     sigbuf[64] = (uint8_t)recover_id;
 
     return 1;
@@ -98,18 +100,27 @@ int secp256_verify_signature(const secp256k1_context *context,
             || msghash == NULL
             || msglen != 32
             || sigdata == NULL
-            || siglen != 64) {
+            || siglen != 65) 
+   {
+         printf("error 22\r\n");
         return 0;
     }
 
     if (!secp256k1_ecdsa_signature_parse_compact(context, &sig, sigdata)) {
-        return 0;
+         printf("error 23\r\n");
+         return 0;
     }
 
     if (!secp256k1_ec_pubkey_parse(context, &pubkey_tmp, pubkey, keylen)) {
+       printf("error 24\r\n");
         return 0;
     }
 
+
+       //     char pptemp[131]={0};
+       // bytes_to_hex(pubkey_tmp, 64, (char *)pptemp);
+       //  printf("pptemp=%s \r\n",pptemp);
+ 
     return secp256k1_ecdsa_verify(context, &sig, msghash, &pubkey_tmp);
 }
 
@@ -133,23 +144,86 @@ int secp256_recover_pubkey(const secp256k1_context *context,
     uint8_t serialized_pubkey[65];
     size_t serialized_keylen = 65;
 
+     if (context == NULL
+      )
+     {
+         printf("error 111!\r\n");
+        return 0;
+    }
+
+
+  if ( msghash == NULL
+           
+      )
+     {
+         printf("error 12!\r\n");
+        return 0;
+    }
+
+
+ if ( msglen != 32
+            
+      )
+     {
+         printf("error 13!\r\n");
+        return 0;
+    }
+
+
+ if ( sigdata == NULL
+            
+      )
+     {
+         printf("error 14!\r\n");
+        return 0;
+    }
+
+
+ if (siglen != 65
+          
+      )
+     {
+         printf("error 15!\r\n");
+        return 0;
+    }
+
+
+ if ( pubkey == NULL
+           
+      )
+     {
+         printf("error 16!\r\n");
+        return 0;
+    }
+
+
+
+    
+
+
+
     if (context == NULL
             || msghash == NULL
             || msglen != 32
             || sigdata == NULL
             || siglen != 65 
-            || sigdata[64] >= 4
+          //  || sigdata[64] >= 4
             || pubkey == NULL
-            || keylen < 65) {
+            || keylen < 65
+      ) 
+     {
+         printf("error 11!\r\n");
         return 0;
     }
 
     if (!secp256k1_ecdsa_recoverable_signature_parse_compact(
                 context, &raw_sig, sigdata, (int)sigdata[64])) {
+        printf("error 22!\r\n");
         return 0;
     }
 
     if (!secp256k1_ecdsa_recover(context, &raw_pubkey, &raw_sig, msghash)) {
+        printf("error 33!\r\n");
         return 0;
     }
 
@@ -158,11 +232,13 @@ int secp256_recover_pubkey(const secp256k1_context *context,
                 &serialized_keylen,
                 &raw_pubkey,
                 SECP256K1_EC_UNCOMPRESSED)) {
+        printf("error 44!\r\n");
         return 0;
     }
 
     /* header:0x04 -- uncompressed public key. */
     if (serialized_pubkey[0] != 0x04) {
+         printf("error 55!\r\n");
         return 0;
     }
 
