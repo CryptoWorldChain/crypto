@@ -46,9 +46,41 @@ extern int sign_transaction(
         const char *data,
         uint8_t *sigbuf);
 
-extern int verify_signature(const void *context,
+
+
+extern int sign_transaction_Ex(
+        const void *context,
+        const char *prikey,
+        const char *nonce,
+        const char *to,
+        const char *gas_price,
+        const char *gas_limit,
+        const char *value,
+        const char *data,
+        uint8_t *hasbuf,
+        int *hashlen,
+        uint8_t *sigbuf,
+        int *len);
+
+
+extern int verify_signature(const void *context,const char *strpublic,
                 uint8_t *msghash, size_t msglen,
                 uint8_t *sigdata, size_t siglen);
+
+
+
+int sign_Data( const void *context,
+        const char *prikey,
+        const char *data,
+        uint8_t *sigbuf);
+
+
+int Data_hash(
+        const void *context,
+        const char *data,
+        uint8_t *hashbuf);
+
+
 
 #if 0
 extern int sign_tx(const char *nonce,
