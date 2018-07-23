@@ -65,7 +65,7 @@ bool fromPriKey(ICKeyPair256 *kp){
 
 	unique_ptr<Ipp8u[]> agen = autoPRNG();
 	IppsPRNGState* pRandGen = (IppsPRNGState*)agen.get(); // 'external' PRNG 
-	Ipp32u secp256r1_r[] = {0xC6325F51, 0xFAC23B9C, 0xA7179E84, 0xBCE6FAAD,0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF}; 
+	Ipp32u secp256r1_r[] = {0xFC632551, 0xF3B9CAC2, 0xA7179E84, 0xBCE6FAAD,0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF}; 
 	const int ordSize = sizeof(secp256r1_r)/sizeof(Ipp32u); 
 	const int byteSize = sizeof(secp256r1_r); 
 
@@ -173,7 +173,11 @@ bool signMessage(ICKeyPair256 *kp,Ipp8u *message){
    Type_BN("Big Number value is:\n", pRandMsg);
 
    IppsBigNumState* pMsg = newBN(ordSize, 0);            // msg to be signed 
-   ippsMod_BN(pRandMsg, pECPorder, pMsg); 
+   //ippsMod_BN(pRandMsg, pECPorder, pMsg); 
+
+   //ippsSetOctString_BN(message, sizeof(message)-1, pMsg);
+
+	ippsSetOctString_BN(message,32, pMsg);
    Type_BN("pMsg:=",pMsg);
 
 
@@ -293,7 +297,9 @@ bool verifyMessage(ICKeyPair256 *kp,Ipp8u *message){
    Type_BN("Big Number value is:\n", pRandMsg);
 
    IppsBigNumState* pMsg = newBN(ordSize, 0);            // msg to be signed 
-   ippsMod_BN(pRandMsg, pECPorder, pMsg); 
+   //ippsMod_BN(pRandMsg, pECPorder, pMsg); 
+   //ippsSetOctString_BN(message, sizeof(message)-1, pMsg);
+   ippsSetOctString_BN(message,32, pMsg);
    Type_BN("pMsg:=",pMsg);
 
 
